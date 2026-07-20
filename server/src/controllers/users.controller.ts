@@ -1,58 +1,69 @@
-import { Request, Response } from "express";
-import { users } from "../data.js";
+import { NextFunction, Request, Response } from "express";
+
 import { CreateUser, ParamsUser, updateUser } from "../types/types.js";
 import { HttpError } from "../utils/httperror.js";
+import { UserModel } from "../models/user.model.js";
+import { UserService } from "../services/users.service.js";
 
-export const getUsers = (req: Request, res: Response) => {
-  res.status(200).json(users);
-};
-export const getUserbyId = (req: Request<ParamsUser>, res: Response) => {
-  const id = req.params.id;
-  const user = users.find((user) => user.id === id);
-  if (!user) {
-    throw HttpError.notFound("User not found at this id");
+export const getUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const users = await UserService.getUsers();
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
   }
-  res.status(200).json(user);
+};
+export const getUserbyId = async (
+  req: Request<ParamsUser>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = await UserService.getUserById(req.params.id);
+    res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const createUser = (req: Request<{}, {}, CreateUser>, res: Response) => {
-  const { name, email } = req.body;
-  const newUser = {
-    id: (users.length + 1).toString(),
-    name,
-    email,
-  };
-  users.push(newUser);
-  res.status(201).json(newUser);
+export const createUser = async (
+  req: Request<{}, {}, CreateUser>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const newUser = await UserService.createUser(req.body);
+    res.status(201).json(newUser);
+  } catch (error) {
+    next(error);
+  }
 };
-export const UpdateUser = (
+export const UpdateUser = async (
   req: Request<ParamsUser, {}, updateUser>,
   res: Response,
+  next: NextFunction,
 ) => {
-  const id = req.params.id;
-  const { name, email } = req.body;
-  console.log("Param id:", id);
-  const user = users.find((user) => {
-    return user.id === id;
-  });
-  console.log("Users:", users);
-  if (!user) {
-   throw  HttpError.notFound( "User not found at this id");
+  try {
+    const user = await UserService.UpdateUser(req.params.id, req.body);
+    res.status(200).json(user);
+  } catch (error) {
+    next(error);
   }
-  if (name !== undefined) {
-    user.name = name;
-  }
-  if (email !== undefined) {
-    user.email = email;
-  }
-  res.status(200).json(user);
 };
-export const deleteUser = (req: Request<ParamsUser>, res: Response) => {
-  const id = req.params.id;
-  const userid = users.findIndex((user) => user.id === id);
-  if (userid === -1) {
-    return res.status(404).json({ message: "user not found at this id" });
+
+export const deleteUser = async (
+  req: Request<ParamsUser>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    await UserService.deleteUser(req.params.id);
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    next(error);
   }
-  users.splice(userid, 1);
-  res.status(200).json({ message: "user deleted successfully" });
 };
