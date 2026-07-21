@@ -1,9 +1,34 @@
-import { UserModel} from "../models/user.model.js";
+import { FilterQuery } from "mongoose";
+import { User, UserModel } from "../models/user.model.js";
 import { CreateUser, updateUser } from "../types/types.js";
+import {
+  GetUserQuery,
+  getUsersQuerySchema,
+} from "../validators/user.validator.js";
 
 export const UserRepository = {
-  findALL: async () => {
-    return UserModel.find();
+  findALL: async ({
+    page,
+    limit,
+    status,
+    city,
+    sortBy,
+    order,
+  }: GetUserQuery) => {
+    const filter: FilterQuery<User> = {};
+    if (status) {
+      filter.status = status;
+    }
+    if (city) {
+      filter.city = city;
+    }
+    const user = await UserModel.find(filter)
+      .sort({
+        [sortBy]: order === "asc" ? 1 : -1,
+      })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    return user;
   },
   findById: async (id: string) => {
     return UserModel.findById(id);

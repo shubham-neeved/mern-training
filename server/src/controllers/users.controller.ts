@@ -4,14 +4,17 @@ import { CreateUser, ParamsUser, updateUser } from "../types/types.js";
 import { HttpError } from "../utils/httperror.js";
 import { UserModel } from "../models/user.model.js";
 import { UserService } from "../services/users.service.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { CreateUserSchema,updateUserSchema,userParamsSchema,getUsersQuerySchema, GetUserQuery } from "../validators/user.validator.js";
 
 export const getUsers = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
-    const users = await UserService.getUsers();
+    const users = await UserService.getUsers(req.query as any);
+
     res.status(200).json(users);
   } catch (error) {
     next(error);

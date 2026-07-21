@@ -1,9 +1,10 @@
 import { UserRepository } from "../repositories/users.repository.js";
 import { CreateUser, updateUser } from "../types/types.js";
 import { HttpError } from "../utils/httperror.js";
+import { GetUserQuery } from "../validators/user.validator.js";
 export const UserService = {
-  getUsers: async () => {
-    return UserRepository.findALL();
+  getUsers: async (query:GetUserQuery) => {
+    return UserRepository.findALL(query);
   },
   getUserById: async (id: string) => {
     const user = await UserRepository.findById(id);
