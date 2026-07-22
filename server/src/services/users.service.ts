@@ -17,7 +17,7 @@ export const UserService = {
   createUser: async (data: CreateUser) => {
     const existingUser = await UserRepository.findByEmail(data.email);
     if (existingUser) {
-      throw HttpError.badRequest("User with this email already exists");
+      throw HttpError.conflictError("User with this email already exists");
     }
     return UserRepository.CreateUser(data);
   },

@@ -22,5 +22,8 @@ export class HttpError extends Error {
   static internalServerError(message: string): HttpError {
     return new HttpError(500, message);
   }
+  static conflictError(message:string):HttpError{
+    return new HttpError(409,message);
+  }
 }
 export default HttpError;

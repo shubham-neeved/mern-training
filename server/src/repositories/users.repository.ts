@@ -22,13 +22,17 @@ export const UserRepository = {
     if (city) {
       filter.city = city;
     }
-    const user = await UserModel.find(filter)
-      .sort({
-        [sortBy]: order === "asc" ? 1 : -1,
-      })
-      .skip((page - 1) * limit)
-      .limit(limit);
-    return user;
+   const query = UserModel.find(filter);
+
+if (sortBy) {
+  query.sort({
+    [sortBy]: order === "asc" ? 1 : -1,
+  });
+}
+
+query.skip((page - 1) * limit).limit(limit);
+
+return query;
   },
   findById: async (id: string) => {
     return UserModel.findById(id);

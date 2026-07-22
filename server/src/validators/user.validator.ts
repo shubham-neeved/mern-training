@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { z } from "zod";
 
 export const CreateUserSchema = z.object({
@@ -52,7 +53,9 @@ export const updateUserSchema = z.object({
 
 export const userParamsSchema = z.object({
   params: z.object({
-    id: z.string(),
+    id: z.string().refine((id)=>mongoose.Types.ObjectId.isValid(id),{
+      message:"invalid user id"
+    }),
   }),
 });
 

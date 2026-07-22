@@ -22,7 +22,12 @@ router.get(
   userController.getUserbyId,
 );
 router.post("/users", validate(CreateUserSchema), userController.createUser);
-router.put("/users/:id", validate(updateUserSchema), userController.UpdateUser);
+router.put(
+  "/users/:id",
+  validate(userParamsSchema),
+  validate(updateUserSchema),
+  userController.UpdateUser,
+);
 router.delete(
   "/users/:id",
   validate(userParamsSchema),
